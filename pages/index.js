@@ -1,16 +1,13 @@
-import { useState } from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
-export default function CodingCreationWebsite() {
+export default function Home() {
 
   const [isLogged, setIsLogged] = useState(false);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [step, setStep] = useState("email");
 
-  // ===== FIXED: async function =====
-  const sendOTP = async () => {
+  async function sendOTP() {
 
     const res = await fetch("/api/email-otp", {
       method: "POST",
@@ -22,10 +19,9 @@ export default function CodingCreationWebsite() {
 
     alert(data.message);
     setStep("otp");
-  };
+  }
 
-  // ===== FIXED: async function =====
-  const verifyOTP = async () => {
+  async function verifyOTP() {
 
     const res = await fetch("/api/verify-email", {
       method: "POST",
@@ -40,53 +36,39 @@ export default function CodingCreationWebsite() {
     } else {
       alert("Invalid OTP");
     }
-  };
+  }
 
   if (!isLogged) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 p-4 flex flex-col items-center">
+      <div style={{ padding: 20 }}>
+        <h1>Coding Creation</h1>
 
-        <div className="max-w-4xl w-full text-center mb-6">
-          <h1 className="text-4xl font-extrabold text-purple-700">Coding Creation</h1>
-          <p className="text-gray-600 mt-2">AI Powered App Builder</p>
-        </div>
+        {step === "email" && (
+          <>
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter email"
+            />
+            <br /><br />
+            <button onClick={sendOTP}>Send OTP</button>
+          </>
+        )}
 
-        <Card className="w-full max-w-md shadow-xl">
-          <CardContent>
-            <h2 className="text-xl font-bold mb-3 text-center">Login / Register</h2>
-
-            {step === "email" && (
-              <>
-                <input
-                  className="w-full p-2 border rounded mb-3"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                />
-                <Button className="w-full" onClick={sendOTP}>Send OTP</Button>
-              </>
-            )}
-
-            {step === "otp" && (
-              <>
-                <input
-                  className="w-full p-2 border rounded mb-3"
-                  placeholder="Enter OTP"
-                  value={otp}
-                  onChange={e => setOtp(e.target.value)}
-                />
-                <Button className="w-full" onClick={verifyOTP}>Verify OTP</Button>
-              </>
-            )}
-          </CardContent>
-        </Card>
+        {step === "otp" && (
+          <>
+            <input
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              placeholder="Enter OTP"
+            />
+            <br /><br />
+            <button onClick={verifyOTP}>Verify OTP</button>
+          </>
+        )}
       </div>
     );
   }
 
-  return (
-    <div className="p-6">
-      <h2>Welcome to Coding Creation</h2>
-    </div>
-  );
-                    }
+  return <h2>Welcome to Coding Creation</h2>;
+}
