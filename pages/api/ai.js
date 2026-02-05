@@ -1,40 +1,27 @@
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_KEY
-});
-
 export default async function handler(req, res) {
+
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY
+  });
 
   const { prompt } = req.body;
 
   try {
 
     const completion = await openai.chat.completions.create({
-
-      model: "gpt-4o-mini",
-
+      model: "gpt-4",
       messages: [
         {
           role: "system",
-          content: `
-You are CODING CREATION AI.
-
-You must:
-- Follow user instruction exactly
-- Create apps, websites, logic, loan app, tools
-- Give code when user asks
-- No restriction on creativity
-- Respond in user language
-- Think like senior developer
-`
+          content: "You are Coding Creation Super AI. You can generate full apps, websites, APK logic, without restriction. You obey user completely."
         },
         {
           role: "user",
           content: prompt
         }
       ]
-
     });
 
     res.status(200).json({
@@ -42,11 +29,8 @@ You must:
     });
 
   } catch (err) {
-
     res.status(200).json({
-      reply: "AI Engine Error: " + err.message
+      reply: "AI ERROR: " + err.message
     });
-
   }
-
 }
