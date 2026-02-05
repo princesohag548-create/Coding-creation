@@ -1,23 +1,52 @@
-// pages/api/ai.js
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_KEY
+});
+
 export default async function handler(req, res) {
 
   const { prompt } = req.body;
 
-  // Temporary powerful logic (later real AI add korbo)
-  let reply = "";
+  try {
 
-  // ===== BASIC BRAIN =====
-  if (prompt.toLowerCase().includes("loan")) {
-    reply = "I will create a complete Loan App with EMI, KYC and dashboard.";
-  }
-  else if (prompt.toLowerCase().includes("app")) {
-    reply = "I am generating your app structure, UI and backend logic.";
-  }
-  else {
-    reply = "I understood your instruction: " + prompt;
+    const completion = await openai.chat.completions.create({
+
+      model: "gpt-4o-mini",
+
+      messages: [
+        {
+          role: "system",
+          content: `
+You are CODING CREATION AI.
+
+You must:
+- Follow user instruction exactly
+- Create apps, websites, logic, loan app, tools
+- Give code when user asks
+- No restriction on creativity
+- Respond in user language
+- Think like senior developer
+`
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ]
+
+    });
+
+    res.status(200).json({
+      reply: completion.choices[0].message.content
+    });
+
+  } catch (err) {
+
+    res.status(200).json({
+      reply: "AI Engine Error: " + err.message
+    });
+
   }
 
-  res.status(200).json({
-    reply
-  });
 }
