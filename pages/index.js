@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { auth } from "../../firebase";
+import { auth } from "../firebase";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
 export default function CodingCreationWebsite() {
@@ -9,19 +9,21 @@ export default function CodingCreationWebsite() {
   const [otp, setOtp] = useState("");
   const [step, setStep] = useState("phone");
 
-  // ===== SEND OTP =====
+  // ===== SEND OTP FUNCTION =====
   const sendOTP = () => {
 
     if(!phone.startsWith("+")){
-      alert("Number must include country code like +91");
+      alert("Please use country code. Example: +91XXXXXXXXXX");
       return;
     }
 
-    window.recaptchaVerifier = new RecaptchaVerifier(
-      "recaptcha-container",
-      { size: "invisible" },
-      auth
-    );
+    try{
+      window.recaptchaVerifier = new RecaptchaVerifier(
+        "recaptcha-container",
+        { size: "invisible" },
+        auth
+      );
+    }catch(e){}
 
     const appVerifier = window.recaptchaVerifier;
 
@@ -32,12 +34,17 @@ export default function CodingCreationWebsite() {
         alert("OTP Sent Successfully!");
       })
       .catch((error) => {
-        alert(error.message);
+        alert("Error: " + error.message);
       });
   };
 
-  // ===== VERIFY OTP =====
+  // ===== VERIFY OTP FUNCTION =====
   const verifyOTP = () => {
+
+    if(!window.confirmationResult){
+      alert("Please request OTP first");
+      return;
+    }
 
     window.confirmationResult
       .confirm(otp)
@@ -65,9 +72,14 @@ export default function CodingCreationWebsite() {
               placeholder="Enter mobile with country code +91"
               value={phone}
               onChange={e => setPhone(e.target.value)}
+              style={{padding:8, width:250}}
             />
+
             <br/><br/>
-            <button onClick={sendOTP}>Send OTP</button>
+
+            <button onClick={sendOTP}>
+              Send OTP
+            </button>
           </div>
         )}
 
@@ -77,9 +89,14 @@ export default function CodingCreationWebsite() {
               placeholder="Enter OTP"
               value={otp}
               onChange={e => setOtp(e.target.value)}
+              style={{padding:8, width:250}}
             />
+
             <br/><br/>
-            <button onClick={verifyOTP}>Verify OTP</button>
+
+            <button onClick={verifyOTP}>
+              Verify OTP
+            </button>
           </div>
         )}
 
@@ -87,10 +104,11 @@ export default function CodingCreationWebsite() {
     );
   }
 
+  // ===== AFTER LOGIN =====
   return (
     <div style={{padding:20}}>
       <h2>Welcome to Coding Creation</h2>
       <p>Login Successful!</p>
     </div>
   );
-                                      }
+              }
