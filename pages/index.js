@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { auth } from "../firebase";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
@@ -9,6 +9,17 @@ export default function CodingCreationWebsite() {
   const [otp, setOtp] = useState("");
   const [step, setStep] = useState("phone");
 
+  // ===== একবারই Recaptcha বানাবে =====
+  useEffect(() => {
+    if (!window.recaptchaVerifier) {
+      window.recaptchaVerifier = new RecaptchaVerifier(
+        auth,
+        "recaptcha-container",
+        { size: "invisible" }
+      );
+    }
+  }, []);
+
   // ===== SEND OTP =====
   const sendOTP = () => {
 
@@ -16,18 +27,6 @@ export default function CodingCreationWebsite() {
       alert("Use country code like +91XXXXXXXXXX");
       return;
     }
-
-    // আগের verifier থাকলে delete
-    if(window.recaptchaVerifier){
-      window.recaptchaVerifier.clear();
-    }
-
-    // ✅ CORRECT SYNTAX
-    window.recaptchaVerifier = new RecaptchaVerifier(
-      auth,
-      "recaptcha-container",
-      { size: "invisible" }
-    );
 
     const appVerifier = window.recaptchaVerifier;
 
@@ -104,4 +103,4 @@ export default function CodingCreationWebsite() {
       <p>Login Successful!</p>
     </div>
   );
-      }
+          }
