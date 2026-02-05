@@ -1,226 +1,136 @@
-import { useState } from "react";
+import { useState } from 'react'; import { Card, CardContent } from "@/components/ui/card"; import { Button } from "@/components/ui/button";
 
 export default function CodingCreationWebsite() {
 
-  const [isLogged, setIsLogged] = useState(false);
-  const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState("");
-  const [step, setStep] = useState("email");
+const [isLogged, setIsLogged] = useState(false); const [email, setEmail] = useState(""); const [otp, setOtp] = useState(""); const [step, setStep] = useState("email");
 
-  const [message, setMessage] = useState("");
-  const [chat, setChat] = useState([]);
-  const [loading, setLoading] = useState(false);
+const [chat, setChat] = useState([]); const [userText, setUserText] = useState(""); const [loading, setLoading] = useState(false);
 
-  // ===== SEND OTP =====
-  const sendOTP = async () => {
-    try {
-      const res = await fetch("/api/email-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email })
-      });
+// ===== EMAIL OTP FUNCTIONS ===== const sendOTP = async () => { const res = await fetch("/api/email-otp", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
 
-      const data = await res.json();
-      alert(data.message);
-      setStep("otp");
+const data = await res.json();
+alert(data.message);
+setStep("otp");
 
-    } catch (err) {
-      alert("OTP send failed");
-    }
-  };
+};
 
-  // ===== VERIFY OTP =====
-  const verifyOTP = async () => {
-    try {
-      const res = await fetch("/api/verify-email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp })
-      });
+const verifyOTP = async () => { const res = await fetch("/api/verify-email", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, otp }) });
 
-      const data = await res.json();
+const data = await res.json();
 
-      if (data.success) {
-        setIsLogged(true);
-      } else {
-        alert("Invalid OTP");
-      }
+if (data.success) {
+  setIsLogged(true);
+} else {
+  alert("Invalid OTP");
+}
 
-    } catch (err) {
-      alert("Verification failed");
-    }
-  };
+};
 
-  // ===== AI CHAT FUNCTION =====
-  const askAI = async () => {
+// ===== REAL GPT‑4 AI CALL ===== const sendToAI = async () => { if (!userText) return;
 
-    if (!message) return;
+setChat(old => [...old, { role: "user", text: userText }]);
+setLoading(true);
 
-    const userText = message;
-    setMessage("");
+try {
+  const res = await fetch("/api/ai", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt: userText })
+  });
 
-    setChat(old => [...old, { role: "user", text: userText }]);
-    setLoading(true);
+  const data = await res.json();
 
-    try {
+  setChat(old => [...old, {
+    role: "ai",
+    text: data.reply
+  }]);
 
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: userText })
-      });
+} catch (err) {
+  setChat(old => [...old, {
+    role: "ai",
+    text: "AI service error: " + err.message
+  }]);
+}
 
-      const data = await res.json();
+setUserText("");
+setLoading(false);
 
-      setChat(old => [...old, {
-        role: "ai",
-        text: data.reply || "AI response will appear here"
-      }]);
+};
 
-    } catch (err) {
+// ================= LOGIN UI ================= if (!isLogged) { return ( <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 p-4 flex flex-col items-center">
 
-      setChat(old => [...old, {
-        role: "ai",
-        text: "AI service not connected yet"
-      }]);
+<div className="max-w-4xl w-full text-center mb-6">
+      <h1 className="text-5xl font-extrabold text-purple-700 tracking-wide">Coding Creation</h1>
+      <p className="text-gray-600 mt-2">AI Powered App Builder – Everything is possible here</p>
+    </div>
 
-    }
+    <Card className="w-full max-w-md shadow-xl backdrop-blur bg-white/70">
+      <CardContent>
+        <h2 className="text-xl font-bold mb-3 text-center">Login / Register</h2>
 
-    setLoading(false);
-  };
+        {step === "email" && (
+          <>
+            <input
+              className="w-full p-2 border rounded mb-3"
+              placeholder="Enter your email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+            />
+            <Button className="w-full" onClick={sendOTP}>Send OTP</Button>
+          </>
+        )}
 
-  // =============== LOGIN PAGE ===============
-  if (!isLogged) {
-    return (
-      <div style={{
-        minHeight: "100vh",
-        background: "linear-gradient(140deg,#e9d5ff,#c7d2fe)",
-        padding: 20
-      }}>
+        {step === "otp" && (
+          <>
+            <input
+              className="w-full p-2 border rounded mb-3"
+              placeholder="Enter OTP"
+              value={otp}
+              onChange={e => setOtp(e.target.value)}
+            />
+            <Button className="w-full" onClick={verifyOTP}>Verify OTP</Button>
+          </>
+        )}
+      </CardContent>
+    </Card>
+  </div>
+);
 
-        <h1 style={{
-          fontSize: 42,
-          textAlign: "center",
-          color: "#6b21a8"
-        }}>
-          Coding Creation
-        </h1>
+}
 
-        <p style={{ textAlign: "center" }}>
-          Everything is possible here
-        </p>
+// ================= DASHBOARD UI ================= return ( <div className="min-h-screen bg-purple-100 p-4">
 
-        {/* BANNER GIF */}
-        <div style={{
-          display: "flex",
-          gap: 10,
-          justifyContent: "center",
-          marginBottom: 10
-        }}>
-          <img src="/banner1.gif" width="45%" />
-          <img src="/banner2.gif" width="45%" />
-        </div>
+<h1 className="text-3xl font-bold mb-4 text-purple-700">AI Builder Panel</h1>
 
-        {/* LOGIN CARD */}
-        <div style={{
-          maxWidth: 400,
-          margin: "auto",
-          backdropFilter: "blur(10px)",
-          background: "rgba(255,255,255,0.4)",
-          padding: 20,
-          borderRadius: 16
-        }}>
+  <Card className="p-4 bg-white/70 backdrop-blur">
+    <CardContent>
 
-          <h3>Login / Signup</h3>
-
-          {step === "email" && (
-            <>
-              <input
-                style={{ width: "100%", padding: 8, marginBottom: 8 }}
-                placeholder="Enter email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-              />
-
-              <button onClick={sendOTP}>
-                Send OTP
-              </button>
-            </>
-          )}
-
-          {step === "otp" && (
-            <>
-              <input
-                style={{ width: "100%", padding: 8, marginBottom: 8 }}
-                placeholder="Enter OTP"
-                value={otp}
-                onChange={e => setOtp(e.target.value)}
-              />
-
-              <button onClick={verifyOTP}>
-                Verify OTP
-              </button>
-            </>
-          )}
-
-        </div>
-      </div>
-    );
-  }
-
-  // =============== DASHBOARD ===============
-
-  return (
-    <div style={{
-      minHeight: "100vh",
-      background: "linear-gradient(140deg,#e9d5ff,#c7d2fe)",
-      padding: 16
-    }}>
-
-      <h2 style={{ color: "#6b21a8" }}>
-        AI Builder Panel
-      </h2>
-
-      <div style={{
-        backdropFilter: "blur(10px)",
-        background: "rgba(255,255,255,0.5)",
-        padding: 12,
-        borderRadius: 16,
-        height: 420,
-        overflow: "auto"
-      }}>
-
-        {chat.map((c, i) => (
-          <div key={i} style={{
-            marginBottom: 8,
-            textAlign: c.role === "user" ? "right" : "left"
-          }}>
-            <div style={{
-              display: "inline-block",
-              padding: 8,
-              borderRadius: 12,
-              background: c.role === "user" ? "#7c3aed" : "#fff",
-              color: c.role === "user" ? "#fff" : "#000"
-            }}>
-              {c.text}
-            </div>
+      <div className="h-[500px] overflow-auto mb-3 p-3 bg-purple-50 rounded">
+        {chat.map((m, i) => (
+          <div key={i} className={`mb-2 ${m.role === 'user' ? 'text-right' : 'text-left'}`}>
+            <span className={`inline-block px-3 py-2 rounded ${m.role === 'user' ? 'bg-purple-600 text-white' : 'bg-white'}`}>
+              {m.text}
+            </span>
           </div>
         ))}
 
-        {loading && <p>AI thinking...</p>}
-
+        {loading && <p className="text-sm">AI thinking...</p>}
       </div>
 
-      <div style={{ display: "flex", marginTop: 10, gap: 8 }}>
+      <div className="flex gap-2">
         <input
-          style={{ flex: 1, padding: 10 }}
-          value={message}
-          onChange={e => setMessage(e.target.value)}
-          placeholder="Tell AI what app you want..."
+          className="flex-1 p-2 border rounded"
+          value={userText}
+          onChange={e => setUserText(e.target.value)}
+          placeholder="Tell AI what you want to build..."
         />
-        <button onClick={askAI}>Send</button>
+
+        <Button onClick={sendToAI}>Send</Button>
       </div>
 
-    </div>
-  );
-}
+    </CardContent>
+  </Card>
+
+</div>
+
+); }
