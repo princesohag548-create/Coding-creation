@@ -1,22 +1,6 @@
 import { useState } from 'react';
-
-// ---- SAFE FIREBASE LOAD ----
-let auth = null;
-let signInWithPhoneNumber = null;
-let RecaptchaVerifier = null;
-
-try {
-  const fb = require("../../firebase");
-  const fbauth = require("firebase/auth");
-
-  auth = fb.auth;
-  signInWithPhoneNumber = fbauth.signInWithPhoneNumber;
-  RecaptchaVerifier = fbauth.RecaptchaVerifier;
-
-} catch (e) {
-  console.log("Firebase not connected – demo mode");
-}
-// ----------------------------
+import { auth } from "../../firebase";
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
 export default function CodingCreationWebsite() {
 
@@ -28,23 +12,24 @@ export default function CodingCreationWebsite() {
   // ===== SEND OTP =====
   const sendOTP = () => {
 
-    if (!auth) {
-      alert("Demo OTP Mode: use 1234");
-      setStep("otp");
+    if(!phone.startsWith("+")){
+      alert("Number must include country code like +91");
       return;
     }
 
     window.recaptchaVerifier = new RecaptchaVerifier(
-      'recaptcha-container',
-      { size: 'invisible' },
+      "recaptcha-container",
+      { size: "invisible" },
       auth
     );
 
-    signInWithPhoneNumber(auth, phone, window.recaptchaVerifier)
+    const appVerifier = window.recaptchaVerifier;
+
+    signInWithPhoneNumber(auth, phone, appVerifier)
       .then((confirmationResult) => {
         window.confirmationResult = confirmationResult;
         setStep("otp");
-        alert("OTP Sent to " + phone);
+        alert("OTP Sent Successfully!");
       })
       .catch((error) => {
         alert(error.message);
@@ -53,15 +38,6 @@ export default function CodingCreationWebsite() {
 
   // ===== VERIFY OTP =====
   const verifyOTP = () => {
-
-    if (!auth) {
-      if (otp === "1234") {
-        setIsLogged(true);
-      } else {
-        alert("Demo OTP is 1234");
-      }
-      return;
-    }
 
     window.confirmationResult
       .confirm(otp)
@@ -76,9 +52,9 @@ export default function CodingCreationWebsite() {
   // ===== LOGIN PAGE =====
   if (!isLogged) {
     return (
-      <div style={{ padding: 20, textAlign: "center" }}>
+      <div style={{ padding:20, textAlign:'center' }}>
 
-        <h1 style={{ color: "purple" }}>Coding Creation</h1>
+        <h1 style={{color:'purple'}}>Coding Creation</h1>
         <h3>Create your dream app</h3>
 
         <div id="recaptcha-container"></div>
@@ -112,7 +88,7 @@ export default function CodingCreationWebsite() {
   }
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{padding:20}}>
       <h2>Welcome to Coding Creation</h2>
       <p>Login Successful!</p>
     </div>
