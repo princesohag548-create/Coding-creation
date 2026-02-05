@@ -2,14 +2,13 @@ import { useState } from 'react';
 
 export default function CodingCreationWebsite() {
 
-  // ================= AUTH PART =================
   const [isLogged, setIsLogged] = useState(false);
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [step, setStep] = useState("phone");
 
   const sendOTP = () => {
-    // real SMS gateway ekhane connect hobe
+    alert("OTP system will be connected soon");
     setStep("otp");
   };
 
@@ -17,26 +16,40 @@ export default function CodingCreationWebsite() {
     setIsLogged(true);
   };
 
-  // =============== LOGIN PAGE ==================
+  // ======= FRONT LANDING PAGE =======
   if (!isLogged) {
     return (
-      <div style={{padding:20, fontFamily:'Arial'}}>
-        
-        <h1 style={{color:'purple'}}>Coding Creation</h1>
+      <div style={{padding:20, fontFamily:'Arial', textAlign:'center'}}>
 
-        <h3>Create your dream app</h3>
-        <p>Coding creation.. everything is possible here.</p>
+        <h1 style={{color:'#6a0dad'}}>Coding Creation</h1>
 
-        {/* ======= AI GIF BANNER ======= */}
-        <div style={{display:'flex', gap:10}}>
-          <img src="/ai1.gif" width="30%" />
-          <img src="/ai2.gif" width="30%" />
-          <img src="/ai3.gif" width="30%" />
+        <h2>Create your dream app</h2>
+
+        <p style={{color:'gray'}}>
+          Coding creation.. everything is possible here.
+        </p>
+
+        {/* ===== AI GIF SECTION ===== */}
+        <div style={{display:'flex', gap:10, justifyContent:'center'}}>
+
+          <img width="30%"
+          src="https://media.giphy.com/media/qgQUggAC3Pfv687qPC/giphy.gif"/>
+
+          <img width="30%"
+          src="https://media.giphy.com/media/26tn33aiTi1jkl6H6/giphy.gif"/>
+
+          <img width="30%"
+          src="https://media.giphy.com/media/l3vR85PnGsBwu1PFK/giphy.gif"/>
+
         </div>
 
         <hr/>
 
         <h3>Login with Mobile</h3>
+
+        <p style={{color:'red'}}>
+          Real SMS OTP coming in next update
+        </p>
 
         {step === "phone" && (
           <div>
@@ -66,7 +79,7 @@ export default function CodingCreationWebsite() {
     );
   }
 
-  // =============== DASHBOARD PART ===============
+  // ======= DASHBOARD =======
 
   const [chat, setChat] = useState("");
   const [code, setCode] = useState("// Generated code will appear here");
@@ -76,7 +89,7 @@ export default function CodingCreationWebsite() {
     setCode(`// Project: ${chat}
 
 function App(){
-  return "This is demo generated app";
+  return "Demo app created";
 }`);
     setDraft("Preview of: " + chat);
   };
@@ -84,9 +97,8 @@ function App(){
   return (
     <div style={{padding:20}}>
 
-      <h2>Coding Creation – App Builder Website</h2>
+      <h2>Coding Creation – App Builder</h2>
 
-      {/* ======== AI BUILDER ======== */}
       <div style={{display:'flex', gap:20}}>
 
         <div style={{width:'33%'}}>
@@ -95,7 +107,7 @@ function App(){
           <textarea
             rows="10"
             style={{width:'100%'}}
-            placeholder="Describe your app in any language..."
+            placeholder="Describe your app..."
             value={chat}
             onChange={e => setChat(e.target.value)}
           />
@@ -104,7 +116,6 @@ function App(){
           <button onClick={buildApp}>Build App</button>
         </div>
 
-        {/* ======== CODE EDITOR ======== */}
         <div style={{width:'33%'}}>
           <h3>Source Code</h3>
 
@@ -116,7 +127,6 @@ function App(){
           />
         </div>
 
-        {/* ======== PREVIEW ======== */}
         <div style={{width:'33%'}}>
           <h3>Preview</h3>
 
@@ -128,9 +138,7 @@ function App(){
 
           <button>Export Website</button>
           <button>Download APK</button>
-          <button>Create API</button>
 
-          {/* ===== ADMIN ONLY ===== */}
           {phone === "8346896508" && (
             <button>Admin Panel</button>
           )}
